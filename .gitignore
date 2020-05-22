@@ -5,5 +5,5 @@
 *.pyc
 .coverage
 /build/
-/config_onion.egg-info/
+/data-printer.egg-info/
 /dist/
