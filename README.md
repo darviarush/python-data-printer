@@ -9,8 +9,10 @@
 # SYNOPSIS
 
 ```python
-import sys
 from data_printer import p, np
+
+import sys
+from colored import fore, back, style
 
 class A:
     def __init__(self, **kw):
