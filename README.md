@@ -21,6 +21,9 @@ class A:
 
 data = A(abc="acc", a=A(x=dict(p=10, r=[20, (2, 0.01)])), s='Строка\n', b=b'binary\n', r=r'\n')
 
+# add ref to themselwes:
+data.a.x['r'].append(data)  
+
 # print colored structure to sys.stdout
 p(data)
 
