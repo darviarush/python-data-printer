@@ -1,0 +1,83 @@
+Metadata-Version: 2.1
+Name: ddp
+Version: 0.0.1
+Summary: ddp - data printer
+Home-page: https://github.com/darviarush/ddp
+Author: Kosmina O. Yaroslav
+Author-email: dart@cpan.org
+License: MIT
+Description: # NAME
+        
+        ddp - data printer
+        
+        # VERSION
+        
+        0.0.1
+        
+        # SYNOPSIS
+        
+        ```
+        import sys
+        from ddp import p, np
+        
+        class A:
+            def __init__(self, **kw):
+                for k, v in kw.items():
+                    setattr(self, k, v)
+        
+        data = A(abc="acc", a=A(x=dict(p=10, r=[20, (2, 0.01)])), s='Строка\n', b=b'binary\n', r=r'\n')
+        
+        # print colored structure to sys.stdout
+        p(data)
+        
+        # print colored structure to file stream
+        p(data, file=sys.stderr)
+        
+        # print uncolored structure to file stream
+        p(data, file=sys.stderr, color=False)
+        
+        # serialize structure to string
+        s = np(data)
+        
+        # serialize structure to colored string (colors as escape sequences)
+        s = np(data, color=True)
+        ```
+        
+        # DESCRIPTION
+        
+        Data recursive printer. Serialize any python3 data to string or print in console or file. 
+        
+        # INSTALL
+        
+        ```sh
+        $ pip install ddp
+        ```
+        
+        # REQUIREMENTS
+        
+        * colored
+        
+        # AUTHOR
+        
+        Kosmina O. Yaroslav <dart@cpan.org>
+        
+        # LICENSE
+        
+        MIT License
+        
+        Copyright (c) 2020 Kosmina O. Yaroslav
+        
+        
+Platform: any
+Classifier: Development Status :: 4 - Beta
+Classifier: Topic :: Text Processing
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.3
+Classifier: Programming Language :: Python :: 3.4
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Requires-Python: >=3.6
+Description-Content-Type: text/markdown

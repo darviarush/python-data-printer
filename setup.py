@@ -13,13 +13,13 @@ def get(r, name):
 version = get(r'^# VERSION\s*(\S+)', "а версия")
 author = get(r'^# AUTHOR\s*([^<>#]+)\s+<([^<>]+)>', " автор")
 description = get(r'^# NAME\s*([^\n]+?)\s*$', "о описание")
-requirements = get(r'^# REQUIREMENTS\s+([^#]*?)\s*#', "ы зависимости")
+requirements = get(r'^# REQUIREMENTS\s*\n\*([^#]*?)\s*#', "ы зависимости")
 
 requirements = requirements.group(1)
 requirements = [] if requirements == 'Нет' else requirements.split('\n* ')
 
 setup(
-    name='ddp',
+    name='data-printer',
     version=version.group(1),
     description=description.group(1),
     long_description=readme,
@@ -29,7 +29,7 @@ setup(
     platforms=['any'],
     python_requires='>=3.6',
     # The project's main homepage.
-    url='https://github.com/darviarush/ddp',
+    url='https://github.com/darviarush/python-data-printer',
 
     # Author details
     author=author.group(1),
@@ -66,3 +66,4 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
+)

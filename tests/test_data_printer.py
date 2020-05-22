@@ -3,7 +3,7 @@ import unittest
 
 sys.path.append(".")
 
-from ddp import p, np
+from data_printer import p, np
 import io
 from colored import fore, back, style
 
