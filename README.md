@@ -8,7 +8,7 @@
 
 # SYNOPSIS
 
-```
+```python
 import sys
 from data_printer import p, np
 

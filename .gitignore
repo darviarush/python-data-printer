@@ -5,5 +5,5 @@
 *.pyc
 .coverage
 /build/
-/data-printer.egg-info/
+/data_printer.egg-info/
 /dist/
