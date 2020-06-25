@@ -109,6 +109,20 @@ class DDP:
             
             self.ref[addr] = self.path[:]
         
+            if isinstance(p, object) and hasattr(p, '__dict__'):
+                self.echo(
+                    p.__class__.__name__+
+                    (' '+p.__name__ if hasattr(p, '__name__') else '')+
+                    (' of '+p.__self__.__class__.__name__ if hasattr(p, '__self__') else '')
+                , self.color.object)
+                self.struct(
+                    fill=bool(p.__dict__),
+                    iterator=p.__dict__.items(),
+                    sk1="(",
+                    sk2=")",
+                    elem_fn=self.el_object,
+                )
+
             if isinstance(p, dict):
                 self.struct(
                     fill=bool(p),
@@ -133,19 +147,8 @@ class DDP:
                     sk2=")",
                     elem_fn=self.el_list,
                 )
-            else:
-                self.echo(
-                    p.__class__.__name__+
-                    (' '+p.__name__ if hasattr(p, '__name__') else '')+
-                    (' of '+p.__self__.__class__.__name__ if hasattr(p, '__self__') else '')
-                , self.color.object)
-                self.struct(
-                    fill=bool(p.__dict__),
-                    iterator=p.__dict__.items(),
-                    sk1="(",
-                    sk2=")",
-                    elem_fn=self.el_object,
-                )
+            
+                
         
         elif isinstance(p, str):
             self.echo(repr(p), self.color.str)
