@@ -4,7 +4,7 @@
 
 # VERSION
 
-0.0.1
+0.0.4
 
 # SYNOPSIS
 
@@ -36,6 +36,9 @@ p(data, file=sys.stderr, color=False)
 # serialize structure to string
 s = np(data)
 
+# serialize structure to string without indexes: [6] -> [0] 6
+s = np(data, indexes=False)
+
 # serialize structure to colored string (colors as escape sequences)
 s = np(data, color=True)
 
@@ -58,6 +61,43 @@ s = np(data, color=dict(
     bool = fore.LIGHT_RED,
     none = fore.LIGHT_YELLOW,
 ))
+
+# print in perl-style (python - default) and without "[0] 7" in list "[7]". 
+p(data, sep="perl", indexes=False)
+
+# print in node-style
+p(data, sep="node")
+
+# self-style
+p(data, sep=dict(
+    kword=True,
+    oword=True,
+    kw=" => ",
+    kv=" => ",
+    object_open="bless {",
+    object_close="}, %n",
+    dict_open="{",
+    dict_close="}",
+    list_open="[",
+    list_close="]",
+    tuple_open="[",
+    tuple_close="]",
+    str='"%s"',
+    bytes='do { use bytes; "%s" }',
+    none="undef",
+    true="1",
+    false="0"
+))
+
+# self-style with two and lambda on bytes
+p(data, sep=dict(
+    str='"%s"',
+    bytes=lambda s: "".join(['Buffer.from(", ', ", ".join(["0x%X" % ch for ch in s]) ,')']),
+))
+
+
+# print without newline on the end
+p(data, end="")
 
 ```
 

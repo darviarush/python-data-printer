@@ -19,6 +19,7 @@ a = A(x=dict(p=10, r=r), f=lambda x: x)
 b = A(abc="acc", a=a, s='Строка\n', b=b'binary\n', r=r, rs=r'\n', delegate=a.__init__)
 r.append( b )
 
+
 class DdpTestCase(unittest.TestCase):
 
     def test_uncolor_string(self):
