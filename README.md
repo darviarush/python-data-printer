@@ -4,7 +4,7 @@
 
 # VERSION
 
-0.0.4
+0.0.5
 
 # SYNOPSIS
 
@@ -51,6 +51,7 @@ p(data, color=dict(
     str = fore.LIGHT_GREEN,
     bytes = fore.LIGHT_MAGENTA,
     object = fore.LIGHT_RED,
+    any = fore.LIGHT_GRAY,
     key = fore.LIGHT_CYAN,
     ref = fore.RED,
     punct = fore.WHITE,

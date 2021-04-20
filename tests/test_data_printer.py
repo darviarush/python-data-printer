@@ -22,6 +22,17 @@ r.append( b )
 
 class DdpTestCase(unittest.TestCase):
 
+    def test_object(self):
+        Int = type("Int", (int,), {})
+        self.assertEqual(np(Int(3)), "Int(3)\n")
+
+        Float = type("Float", (float,), {})
+        self.assertEqual(np(Float(-3.3)), "Float(-3.3)\n")
+
+        Str = type("Str", (str,), {})
+        self.assertEqual(np(Str("x")), "Str('x')\n")
+
+
     def test_uncolor_string(self):
          
         s=np(b)

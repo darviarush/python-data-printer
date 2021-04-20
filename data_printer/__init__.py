@@ -13,6 +13,7 @@ SCHEME_COLORS_DEFAULT = dict(
     str = fore.LIGHT_GREEN,
     bytes = fore.LIGHT_MAGENTA,
     object = fore.LIGHT_RED,
+    any = fore.LIGHT_GRAY,
     key = fore.LIGHT_CYAN,
     ref = fore.RED,
     punct = fore.WHITE,
@@ -166,12 +167,14 @@ class DDP:
             self.echo('[%d] ' % k, self.color.punct)
         self.np(v)
 
-    def struct(self, fill, iterator, sk1, sk2, elem_fn):
+    def struct(self, fill, iterator, sk1, sk2, elem_fn, before=None, before_color=None):
         ''' Структура '''
         space = self.ident(len(self.path))
         self.path.append(None)
         spaces = self.ident(len(self.path))
         self.echo(sk1, self.color.punct)
+        if before is not None:
+            self.echo(before, before_color)
         if fill:
             self.echo("\n", style.RESET)
             for e in iterator:
@@ -199,7 +202,7 @@ class DDP:
 
     def np(self, p):
         """ Распечатывает данные в список """
-        
+
         if isinstance(p, (dict, list, tuple)) or isinstance(p, object) and hasattr(p, '__dict__'):
         
             if id(p) in self.ref:
@@ -215,7 +218,17 @@ class DDP:
                 sk1 = self.sep.object_open.replace("%n", name)
                 sk2 = self.sep.object_close.replace("%n", name)
 
+                before = None
+                before_color = None
+                for maybe_type in [int, bool, float, str, bytes, type(None)]:
+                    if isinstance(p, maybe_type):
+                        before = repr(p)
+                        before_color = getattr(self.color, 'none' if maybe_type == type(None) else maybe_type.__name__)
+                        break
+
                 self.struct(
+                    before=before,
+                    before_color=before_color,
                     fill=bool(p.__dict__),
                     iterator=p.__dict__.items(),
                     sk1=sk1,
@@ -261,8 +274,10 @@ class DDP:
         elif isinstance(p, bytes):
             s = self.sep.bytes(p) if callable(self.sep.bytes) else self.sep.bytes.replace("%s", repr(p)[2:-1])
             self.echo(s, self.color.bytes)
-        else:
+        elif p is None:
             self.echo(self.sep.none, self.color.none)
+        else:
+            self.echo(str(p), self.color.any)
 
 
 
