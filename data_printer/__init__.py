@@ -277,7 +277,7 @@ class DDP:
         elif p is None:
             self.echo(self.sep.none, self.color.none)
         else:
-            self.echo(str(p), self.color.any)
+            self.echo("%s %s" % (p, type(p)), self.color.any)
 
 
 
