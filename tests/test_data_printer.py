@@ -88,11 +88,10 @@ class DdpTestCase(unittest.TestCase):
             x = True
         self.assertTrue(x, "Нет ключа")
         
-    def test_obj_without_dict(self):
+    def test_object_without_dict(self):
         from datetime import datetime
         s=np(datetime.strptime('09.07.2006 00:23:23', '%d.%m.%Y %H:%M:%S'))
-        self.assertEqual(s, "2006-07-09 00:23:23 <class 'datetime.datetime'>\n", 'Распечатан объект без словаря')
-            
+        self.assertEqual(s, "datetime('2006-07-09 00:23:23')\n", 'Распечатан объект без словаря')
 
 
 if __name__ == '__main__':

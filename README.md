@@ -4,7 +4,7 @@
 
 # VERSION
 
-0.0.7
+0.0.8
 
 # SYNOPSIS
 
@@ -85,6 +85,7 @@ p(data, sep=dict(
     tuple_close="]",
     str='"%s"',
     bytes='do { use bytes; "%s" }',
+    scalar='%n("%s")',      # for datetime.datetime and others
     none="undef",
     true="1",
     false="0"
@@ -95,6 +96,12 @@ p(data, sep=dict(
     str='"%s"',
     bytes=lambda s: "".join(['Buffer.from(", ', ", ".join(["0x%X" % ch for ch in s]) ,')']),
 ))
+
+# filters use for specific objects
+import datetime
+p([datetime.datetime.now()], filters={
+    datetime.datetime: lambda obj, ddp: ddp.echo("⎈ ", ddp.color.key).echo(repr(obj), ddp.color.any),
+})
 
 
 # print without newline on the end
@@ -122,7 +129,7 @@ $ pip install data-printer
 
 # AUTHOR
 
-Kosmina O. Yaroslav <dart@cpan.org>
+Kosmina O. Yaroslav <darviarush@mail.ru>
 
 # LICENSE
 

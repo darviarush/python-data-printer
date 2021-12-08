@@ -46,9 +46,10 @@ SCHEME_PYTHON = dict(
     tuple_close=")",
     str="'%s'",
     bytes="b'%s'",
+    scalar="%n('%s')",
     none="None",
     true="True",
-    false="False"
+    false="False",
 )
 
 SCHEME_PERL = dict(
@@ -66,9 +67,10 @@ SCHEME_PERL = dict(
     tuple_close="]",
     str='"%s"',
     bytes='do { use bytes; "%s" }',
+    scalar='%n ("%s")',
     none="undef",
     true="1",
-    false="0"
+    false="0",
 )
 
 SCHEME_NODE = dict(
@@ -86,9 +88,10 @@ SCHEME_NODE = dict(
     tuple_close="]",
     str='"%s"',
     bytes=lambda s: "".join(['Buffer.from([', ", ".join(["0x%X" % ch for ch in s]) ,'])']),
+    scalar="new %n('%s')",
     none="null",
     true="true",
-    false="false"
+    false="false",
 )
 
 SCHEME_SEP = dict(
@@ -115,7 +118,7 @@ def is_word(s):
 
 
 class DDP:
-    def __init__(self, color, sep):
+    def __init__(self, color, sep, filters):
         self.ref = {}   # memaddr => pathaddr
         self._idents = []
         self.s = []
@@ -124,12 +127,14 @@ class DDP:
         self.is_color = bool(color)
         self.indexes = True
         self.sep = SchemeSeparators(**sep) if isinstance(sep, dict) else (sep if isinstance(sep, SchemeSeparators) else SchemeSeparators(**SCHEME_SEP[sep]))
+        self.filters = filters
         
     
     def echo(self, x, c):
         if self.is_color:
             self.s.append(c)
         self.s.append(x)
+        return self
     
         
     def ident(self, n):
@@ -149,6 +154,7 @@ class DDP:
             self.np(k)
         self.echo(self.sep.kv, self.color.punct)
         self.np(v)
+        return self
 
 
     def el_object(self, k, v):
@@ -159,6 +165,7 @@ class DDP:
             self.np(k)
         self.echo(self.sep.kw, self.color.punct)
         self.np(v)
+        return self
 
 
     def el_list(self, k, v):
@@ -166,6 +173,7 @@ class DDP:
         if self.indexes:
             self.echo('[%d] ' % k, self.color.punct)
         self.np(v)
+        return self
 
     def struct(self, fill, iterator, sk1, sk2, elem_fn, before=None, before_color=None):
         ''' Структура '''
@@ -186,6 +194,7 @@ class DDP:
             self.echo(space, '')
         self.echo(sk2, self.color.punct)
         self.path.pop()
+        return self
 
 
     def object_name(self, p):
@@ -198,17 +207,23 @@ class DDP:
     def echo_ref(self, p):
         """ Распечатывает ссылку """
         self.echo("<%s at %s>" % (type(p), '.'.join(self.ref[id(p)]) or '<root>'), self.color.ref)
+        return self
 
 
     def np(self, p):
         """ Распечатывает данные в список """
 
-        if isinstance(p, (dict, list, tuple)) or isinstance(p, object) and hasattr(p, '__dict__'):
-        
-            if id(p) in self.ref:
-                self.echo_ref(p)
-                return
-            
+        is_struct = isinstance(p, (dict, list, tuple)) or isinstance(p, object) and hasattr(p, '__dict__')
+
+        if is_struct and id(p) in self.ref:
+            self.echo_ref(p)
+            return
+
+        if type(p) in self.filters:
+            fn = self.filters[type(p)]
+            return fn(p, self)
+
+        if is_struct:
             self.ref[id(p)] = self.path[:]
         
             if isinstance(p, object) and hasattr(p, '__dict__'):
@@ -260,9 +275,7 @@ class DDP:
                     sk2=self.sep.tuple_close,    # )
                     elem_fn=self.el_list,
                 )
-            
                 
-        
         elif isinstance(p, str):
             self.echo(self.sep.str.replace("%s", repr(p)[1:-1]), self.color.str)
         elif isinstance(p, bool):
@@ -276,13 +289,18 @@ class DDP:
             self.echo(s, self.color.bytes)
         elif p is None:
             self.echo(self.sep.none, self.color.none)
-        else:
-            self.echo("%s %s" % (p, type(p)), self.color.any)
+        else: # Например, datetime.datetime ⌘:
+            name = self.object_name(p)
+            if self.is_color:
+                name = "%s%s%s" % (self.color.object, name, self.color.punct)
+            x = self.sep.scalar.replace("%n", name).replace("%s", str(p))
+            self.echo(x, self.color.any)
+        return self
 
 
 
-def np(p, color=False, indexes=True, sep="python", end='\n'):
-    x = DDP(color, sep)
+def np(p, color=False, indexes=True, sep="python", end='\n', filters={}):
+    x = DDP(color, sep, filters)
     x.indexes = indexes
     x.np(p)
     x.echo(end, style.RESET)
@@ -291,8 +309,8 @@ def np(p, color=False, indexes=True, sep="python", end='\n'):
 
 
 class DDPFile(DDP):
-    def __init__(self, file, color, sep):
-        super().__init__(color, sep)
+    def __init__(self, file, color, sep, filters):
+        super().__init__(color, sep, filters)
         self.file=file
 
 
@@ -300,11 +318,12 @@ class DDPFile(DDP):
         if self.is_color:
             self.file.write(c)
         self.file.write(x)
+        return self
 
 
 
-def p(data, file=sys.stdout, color=True, indexes=True, sep="python", end='\n'):
-    x = DDPFile(file, color, sep)
+def p(data, file=sys.stdout, color=True, indexes=True, sep="python", end='\n', filters={}):
+    x = DDPFile(file, color, sep, filters)
     x.indexes = indexes
     x.np(data)
     x.echo(end, style.RESET)
